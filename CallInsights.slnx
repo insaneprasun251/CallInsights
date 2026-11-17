@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Core/Core.csproj" Id="93d20424-681a-4bcf-8511-c991e83a9b19" />
+  <Project Path="DataLayer/DataLayer.csproj" Id="eba49030-eddd-4175-bc83-2d9d583ab933" />
+  <Project Path="ServiceLayer/ServiceLayer.csproj" Id="73fddf8f-1425-460d-9934-7e8bd7808df9" />
+  <Project Path="UI.Web.Api/UI.Web.Api.csproj" Id="f706bc7a-9361-46d4-b5de-ea2241bba743" />
+</Solution>

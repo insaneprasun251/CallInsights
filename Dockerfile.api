@@ -1,0 +1,44 @@
+# Build context: the CallInsights solution folder
+
+# --- Linux LGPL ffmpeg (same BtbN n9.0 series as the Windows build) ---
+FROM debian:trixie-slim AS ffmpeg
+ARG TARGETARCH
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends curl xz-utils ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+RUN case "$TARGETARCH" in \
+      amd64) FF=linux64 ;; \
+      arm64) FF=linuxarm64 ;; \
+      *) echo "Unsupported arch: $TARGETARCH" && exit 1 ;; \
+    esac \
+ && curl -fsSL -o /tmp/ffmpeg.tar.xz \
+      "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n9.0-latest-${FF}-lgpl-9.0.tar.xz" \
+ && mkdir -p /tmp/ff /opt/ffmpeg \
+ && tar -xJf /tmp/ffmpeg.tar.xz -C /tmp/ff --strip-components=1 \
+ && cp /tmp/ff/bin/ffmpeg /tmp/ff/bin/ffprobe /opt/ffmpeg/
+
+# --- Build the API ---
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+# Restore first, so this layer is cached until a csproj changes
+COPY Core/Core.csproj Core/
+COPY DataLayer/DataLayer.csproj DataLayer/
+COPY ServiceLayer/ServiceLayer.csproj ServiceLayer/
+COPY UI.Web.Api/UI.Web.Api.csproj UI.Web.Api/
+RUN dotnet restore UI.Web.Api/UI.Web.Api.csproj
+
+COPY Core Core
+COPY DataLayer DataLayer
+COPY ServiceLayer ServiceLayer
+COPY UI.Web.Api UI.Web.Api
+RUN dotnet publish UI.Web.Api/UI.Web.Api.csproj -c Release -o /app/publish --no-restore
+
+# --- Runtime ---
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+COPY --from=ffmpeg /opt/ffmpeg /opt/ffmpeg
+WORKDIR /app
+COPY --from=build /app/publish .
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+ENTRYPOINT ["dotnet", "UI.Web.Api.dll"]

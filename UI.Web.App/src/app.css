@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --color-canvas: #f6f7f9;
+  --color-sidebar: #eef0f4;
+  --color-surface: #ffffff;
+  --color-line: #e3e6ec;
+
+  --color-ink: #2b3040;
+  --color-muted: #6b7280;
+  --color-muted-sidebar: #596070;
+
+  --color-primary: #6c7cf0;
+  --color-primary-tint: #e8ebfe;
+  --color-primary-solid: #5967db;
+  --color-primary-solid-hover: #4b58c4;
+
+  --color-sage: #7dbfa7;
+  --color-sage-text: #2f6b55;
+
+  --color-high: #e7787a;
+  --color-high-text: #b4393c;
+  --color-medium: #f0b35a;
+  --color-low: #7da8e8;
+  --color-done: #7dbfa7;
+  --color-idle: #b4bac6;
+
+  --radius-lg: 12px;
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+  --animate-pop: pop 200ms ease-out;
+  @keyframes pop {
+    0% { transform: scale(0.6); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+}
+
+@layer base {
+  :root { color-scheme: light; }
+
+  html, body, #app { height: 100%; }
+
+  body {
+    margin: 0;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  a, button, input {
+    transition: background-color 150ms ease, border-color 150ms ease,
+      color 150ms ease, box-shadow 150ms ease;
+  }
+
+  button:not(:disabled) { cursor: pointer; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
